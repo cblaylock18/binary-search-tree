@@ -28,7 +28,7 @@ const buildTreeRecursive =
 const buildTree = function sortArrayThenCallRecursiveFunction(array) {
   // sort array and remove duplicates
   const sortedArray = mergeSortAndRemoveDuplicates(array);
-
+  if (!sortedArray) return;
   return buildTreeRecursive(sortedArray);
 };
 
@@ -74,6 +74,8 @@ function merge(left, right) {
 }
 
 function mergeSortAndRemoveDuplicates(array) {
+  if (!array) return null;
+
   const n = array.length;
 
   // base case
@@ -105,7 +107,7 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 };
 
 class Node {
-  constructor(data) {
+  constructor(data = null) {
     this.data = data;
     this.left = null;
     this.right = null;
@@ -117,18 +119,27 @@ class Tree {
     this.root = buildTree(array);
   }
 
-  insertValue(value) {
+  insert(value) {
+    // if the passed value isn't true, don't insert it
     if (!value) return;
 
+    // if the tree is currently empty, add new value as the root
+    if (!this.root) {
+      this.root = new Node(value);
+      return;
+    }
+
+    // initialize variables for while loop
     let currentNode = this.root;
     let previousNode;
-    let ignoreDueToDuplicate = false;
     let currentSide;
 
-    while (currentNode && !ignoreDueToDuplicate) {
+    // find where to insert new value and keep track of whether it goes on the left or right
+    while (currentNode) {
       previousNode = currentNode;
       if (value === currentNode.data) {
-        ignoreDueToDuplicate = true;
+        // ignore if duplicate
+        return;
       } else if (value < currentNode.data) {
         currentNode = currentNode.left;
         currentSide = "left";
@@ -138,9 +149,95 @@ class Tree {
       }
     }
 
-    if (ignoreDueToDuplicate) return;
-
+    // append node
     previousNode[currentSide] = new Node(value);
+  }
+
+  deleteItem(value) {
+    // if the passed value isn't true, don't delete it
+    if (!value) return;
+
+    // initialize variables for while loop
+    let currentNode = this.root;
+    let previousNode;
+    let doesNotExist = true;
+    let currentSide;
+
+    // find location of value in the tree
+    while (currentNode && doesNotExist) {
+      if (value === currentNode.data) {
+        doesNotExist = false;
+      }
+      if (value < currentNode.data) {
+        previousNode = currentNode;
+        currentNode = currentNode.left;
+        currentSide = "left";
+      } else if (value > currentNode.data) {
+        previousNode = currentNode;
+        currentNode = currentNode.right;
+        currentSide = "right";
+      }
+    }
+
+    // if the value does not exist, don't delete it
+    if (doesNotExist) return;
+
+    // if value exists, delete per one of three conditions
+
+    // Case 1. Delete a Leaf Node in BST
+    if (!currentNode.left && !currentNode.right) {
+      if (currentNode === this.root) {
+        this.root = null;
+      } else {
+        previousNode[currentSide] = null;
+      }
+    }
+    // Case 2. Delete a Node with Single Child in BST
+    else if (currentNode.left && !currentNode.right) {
+      if (currentNode === this.root) {
+        this.root = currentNode.left;
+      } else {
+        previousNode[currentSide] = currentNode.left;
+      }
+    } else if (!currentNode.left && currentNode.right) {
+      if (currentNode === this.root) {
+        this.root = currentNode.right;
+      } else {
+        previousNode[currentSide] = currentNode.right;
+      }
+    }
+    // Case 3. Delete a Node with Both Children in BST
+    else {
+      let searchNode = currentNode.right;
+
+      while (searchNode.left) {
+        searchNode = searchNode.left;
+      }
+
+      this.deleteItem(searchNode.data);
+      currentNode.data = searchNode.data;
+    }
+  }
+
+  find(value) {
+    // if the passed value isn't true, don't find it
+    if (!value) return null;
+
+    // initialize variables for while loop
+    let currentNode = this.root;
+
+    // find location of value in the tree
+    while (currentNode) {
+      if (value === currentNode.data) {
+        return currentNode;
+      }
+      if (value < currentNode.data) {
+        currentNode = currentNode.left;
+      } else if (value > currentNode.data) {
+        currentNode = currentNode.right;
+      }
+    }
+    return null;
   }
 }
 
