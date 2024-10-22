@@ -116,6 +116,32 @@ class Tree {
   constructor(array) {
     this.root = buildTree(array);
   }
+
+  insertValue(value) {
+    if (!value) return;
+
+    let currentNode = this.root;
+    let previousNode;
+    let ignoreDueToDuplicate = false;
+    let currentSide;
+
+    while (currentNode && !ignoreDueToDuplicate) {
+      previousNode = currentNode;
+      if (value === currentNode.data) {
+        ignoreDueToDuplicate = true;
+      } else if (value < currentNode.data) {
+        currentNode = currentNode.left;
+        currentSide = "left";
+      } else if (value > currentNode.data) {
+        currentNode = currentNode.right;
+        currentSide = "right";
+      }
+    }
+
+    if (ignoreDueToDuplicate) return;
+
+    previousNode[currentSide] = new Node(value);
+  }
 }
 
 export { Tree, prettyPrint };
