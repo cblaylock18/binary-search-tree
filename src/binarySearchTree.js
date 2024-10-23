@@ -239,6 +239,58 @@ class Tree {
     }
     return null;
   }
+
+  levelOrder(callback) {
+    if (typeof callback !== "function") {
+      throw new Error("A valid callback function is required.");
+    }
+
+    if (this.root === null) return;
+
+    let currentNode = this.root;
+    let queue = [currentNode];
+
+    while (queue.length > 0) {
+      let firstInQueue = queue.shift();
+      callback(firstInQueue);
+
+      if (firstInQueue.left) {
+        queue.push(firstInQueue.left);
+      }
+
+      if (firstInQueue.right) {
+        queue.push(firstInQueue.right);
+      }
+    }
+  }
+
+  inOrder(callback) {
+    if (typeof callback !== "function") {
+      throw new Error("A valid callback function is required.");
+    }
+
+    if (this.root === null) return;
+
+    let currentNode = this.root;
+    let stack = [currentNode];
+    let i = 0;
+    while (stack.length > 0 && i < 20) {
+      // need to fix logic inside here for the stack, maybe start from scratch with recursion instead of wonky stack array??
+      if (stack[stack.length - 1].left) {
+        stack.push(stack[stack.length - 1].left);
+      } else if (!stack[stack.length - 1].left) {
+        callback(stack[stack.length - 1]);
+        stack.pop();
+        callback(stack[stack.length - 1]);
+        if (stack[stack.length - 1].right) {
+          let addToRight = stack[stack.length - 1].right;
+          stack.pop();
+          stack.push(addToRight);
+        }
+      }
+      i++;
+    }
+  }
 }
 
 export { Tree, prettyPrint };
