@@ -121,10 +121,10 @@ class Tree {
 
   insert(value) {
     // if the passed value isn't true, don't insert it
-    if (!value) return;
+    if (value === null) return;
 
     // if the tree is currently empty, add new value as the root
-    if (!this.root) {
+    if (this.root === null) {
       this.root = new Node(value);
       return;
     }
@@ -155,7 +155,7 @@ class Tree {
 
   deleteItem(value) {
     // if the passed value isn't true, don't delete it
-    if (!value) return;
+    if (value === null) return;
 
     // initialize variables for while loop
     let currentNode = this.root;
@@ -185,7 +185,7 @@ class Tree {
     // if value exists, delete per one of three conditions
 
     // Case 1. Delete a Leaf Node in BST
-    if (!currentNode.left && !currentNode.right) {
+    if (currentNode.left === null && currentNode.right === null) {
       if (currentNode === this.root) {
         this.root = null;
       } else {
@@ -193,13 +193,13 @@ class Tree {
       }
     }
     // Case 2. Delete a Node with Single Child in BST
-    else if (currentNode.left && !currentNode.right) {
+    else if (currentNode.left && currentNode.right === null) {
       if (currentNode === this.root) {
         this.root = currentNode.left;
       } else {
         previousNode[currentSide] = currentNode.left;
       }
-    } else if (!currentNode.left && currentNode.right) {
+    } else if (currentNode.left === null && currentNode.right) {
       if (currentNode === this.root) {
         this.root = currentNode.right;
       } else {
@@ -221,7 +221,7 @@ class Tree {
 
   find(value) {
     // if the passed value isn't true, don't find it
-    if (!value) return null;
+    if (value === null) return null;
 
     // initialize variables for while loop
     let currentNode = this.root;
@@ -271,25 +271,119 @@ class Tree {
 
     if (this.root === null) return;
 
-    let currentNode = this.root;
-    let stack = [currentNode];
-    let i = 0;
-    while (stack.length > 0 && i < 20) {
-      // need to fix logic inside here for the stack, maybe start from scratch with recursion instead of wonky stack array??
-      if (stack[stack.length - 1].left) {
-        stack.push(stack[stack.length - 1].left);
-      } else if (!stack[stack.length - 1].left) {
-        callback(stack[stack.length - 1]);
-        stack.pop();
-        callback(stack[stack.length - 1]);
-        if (stack[stack.length - 1].right) {
-          let addToRight = stack[stack.length - 1].right;
-          stack.pop();
-          stack.push(addToRight);
-        }
-      }
-      i++;
+    this.inOrderRecursion(this.root, callback);
+  }
+
+  inOrderRecursion(node, callback) {
+    if (node === null) {
+      return;
     }
+
+    // Traverse the left subtree
+    this.inOrderRecursion(node.left, callback);
+
+    // Visit the current node
+    callback(node);
+
+    // Traverse the right subtree
+    this.inOrderRecursion(node.right, callback);
+  }
+
+  preOrder(callback) {
+    if (typeof callback !== "function") {
+      throw new Error("A valid callback function is required.");
+    }
+
+    if (this.root === null) return;
+
+    this.preOrderRecursion(this.root, callback);
+  }
+
+  preOrderRecursion(node, callback) {
+    if (node === null) {
+      return;
+    }
+
+    // Visit the current node
+    callback(node);
+
+    // Traverse the left subtree
+    this.preOrderRecursion(node.left, callback);
+
+    // Traverse the right subtree
+    this.preOrderRecursion(node.right, callback);
+  }
+
+  postOrder(callback) {
+    if (typeof callback !== "function") {
+      throw new Error("A valid callback function is required.");
+    }
+
+    if (this.root === null) return;
+
+    this.postOrderRecursion(this.root, callback);
+  }
+
+  postOrderRecursion(node, callback) {
+    if (node === null) {
+      return;
+    }
+
+    // Traverse the left subtree
+    this.postOrderRecursion(node.left, callback);
+
+    // Traverse the right subtree
+    this.postOrderRecursion(node.right, callback);
+
+    // Visit the current node
+    callback(node);
+  }
+
+  height(node) {
+    return this.heightRecursive(node);
+  }
+
+  heightRecursive(node) {
+    if (node === null) {
+      return -1;
+    }
+
+    return (
+      1 +
+      Math.max(
+        this.heightRecursive(node.left),
+        this.heightRecursive(node.right),
+      )
+    );
+  }
+
+  depth(node) {
+    if (node === null) return null;
+
+    const value = node.data;
+
+    // if the passed value isn't true, don't find it
+    if (value === null) return null;
+
+    // initialize variables for while loop
+    let currentNode = this.root;
+    let depth = 0;
+
+    // find location of value in the tree
+    while (currentNode) {
+      if (value === currentNode.data) {
+        break;
+      } else if (value < currentNode.data) {
+        currentNode = currentNode.left;
+      } else if (value > currentNode.data) {
+        currentNode = currentNode.right;
+      }
+      depth++;
+    }
+
+    if (currentNode === null) return;
+
+    return depth;
   }
 }
 
