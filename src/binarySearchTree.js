@@ -28,7 +28,7 @@ const buildTreeRecursive =
 const buildTree = function sortArrayThenCallRecursiveFunction(array) {
   // sort array and remove duplicates
   const sortedArray = mergeSortAndRemoveDuplicates(array);
-  if (!sortedArray) return;
+  if (!sortedArray) return null;
   return buildTreeRecursive(sortedArray);
 };
 
@@ -74,7 +74,7 @@ function merge(left, right) {
 }
 
 function mergeSortAndRemoveDuplicates(array) {
-  if (!array) return null;
+  if (!array || array.length === 0) return null;
 
   const n = array.length;
 
@@ -384,6 +384,41 @@ class Tree {
     if (currentNode === null) return;
 
     return depth;
+  }
+
+  isBalanced() {
+    if (this.root === null) {
+      return true;
+    }
+
+    return this.isBalancedRecursive(this.root) !== -1;
+  }
+
+  isBalancedRecursive(node) {
+    if (node === null) return 0;
+
+    const left = this.isBalancedRecursive(node.left);
+    if (left === -1) return -1;
+
+    const right = this.isBalancedRecursive(node.right);
+    if (right === -1) return -1;
+
+    if (left - right > 1 || left - right < -1) {
+      return -1;
+    }
+    return Math.max(left, right) + 1;
+  }
+
+  rebalance() {
+    let rebalanceArray = [];
+
+    function addToRebalanceArray(node) {
+      rebalanceArray.push(node.data);
+    }
+
+    this.levelOrder(addToRebalanceArray);
+
+    this.root = buildTree(rebalanceArray);
   }
 }
 
